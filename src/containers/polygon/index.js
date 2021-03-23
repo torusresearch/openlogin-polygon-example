@@ -71,7 +71,7 @@ function Polygon() {
     <div>
       <PageHeader
         className="site-page-header"
-        title="Openlogin polygon boilerplate"
+        title="Openlogin x Polygon"
         extra={[
           <Button key="1" type="primary" onClick={handleLogout}>
             Logout

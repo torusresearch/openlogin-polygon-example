@@ -16,7 +16,7 @@ function Login() {
   return (
     <div className="loginContainer">
       <div className="loginContainer">
-        <h1 style={{ textAlign: "center" }}>Openlogin polygon boilerplate</h1>
+        <h1 style={{ textAlign: "center" }}>Openlogin x Polygon</h1>
         <div onClick={handleLogin} className="btn">
           Login
         </div>
