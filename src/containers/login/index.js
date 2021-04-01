@@ -7,7 +7,10 @@ import "./style.scss";
 
 function Login() {
   async function handleLogin() {
-    const sdkInstance = new OpenLogin({ clientId: verifiers.google.clientId, iframeUrl: "http://beta.openlogin.com" });
+    const sdkInstance = new OpenLogin({ 
+      clientId: "YOUR_PROJECT_ID", 
+      network: "testnet"
+    });
     await sdkInstance.login({
       loginProvider: "google",
       redirectUrl: `${window.origin}/polygon`,

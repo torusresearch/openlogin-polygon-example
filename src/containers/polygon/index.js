@@ -6,9 +6,7 @@ import Matic from '@maticnetwork/maticjs';
 import Network from '@maticnetwork/meta/network';
 import { PageHeader, Button } from "antd";
 import { useHistory } from "react-router";
-import { verifiers } from "../../utils/config";
 import "./style.scss";
-
 
 
 function Polygon() {
@@ -17,40 +15,8 @@ function Polygon() {
   const [accountInfo, setUserAccountInfo] = useState(null);
   
   const history = useHistory();
-  useEffect(() => {
-    const web3 = new Web3();
-    async function initializeOpenlogin() {
-      setLoading(true)
-      const sdkInstance = new OpenLogin({ clientId: verifiers.google.clientId, iframeUrl: "http://beta.openlogin.com" });
-      await sdkInstance.init();
-      if (!sdkInstance.privKey) {
-        await sdkInstance.login({
-          loginProvider: "google",
-          redirectUrl: `${window.origin}/polygon`,
-        });
-      }
 
-      const account = web3.eth.accounts.privateKeyToAccount(sdkInstance.privKey)
-      const { matic, network } = await getMaticClient("mainnet", "v1");
-      const tokenAddress = network.Matic.Contracts.Tokens.MaticToken
-      matic.setWallet(sdkInstance.privKey);
-      let address = account.address;
-      const balance = await matic.balanceOfERC20(
-        address, //User address
-        tokenAddress, // Token address
-        {
-          parent: false
-        }
-      )
-      setUserAccountInfo({balance, address});
-      setSdk(sdkInstance);
-      setLoading(false)
-    }
-    
-    initializeOpenlogin();
-  }, []);
-
-  async function getMaticClient(_network, _version) {
+  const getMaticClient = useCallback(async(_network, _version) => {
     const network = new Network(_network, _version);
     console.log(network.Main.RPC, network.Matic.RPC)
     const matic = new Matic({
@@ -61,7 +27,45 @@ function Polygon() {
     })
     await matic.initialize()
     return { matic, network }
-  }
+  },[]);
+
+  const getMaticAccountDetails = useCallback(async(privateKey) =>{
+    const { matic, network } = await getMaticClient("mainnet", "v1");
+    const tokenAddress = network.Matic.Contracts.Tokens.MaticToken
+    matic.setWallet(privateKey);
+
+    const account = matic.web3Client.web3.eth.accounts.privateKeyToAccount(privateKey);
+    let address = account.address;
+
+    const balance = await matic.balanceOfERC20(
+      address, //User address
+      tokenAddress, // Token address
+      {
+        parent: false
+      }
+    )
+    setUserAccountInfo({balance, address});
+  },[getMaticClient]);
+
+  useEffect(() => {
+    async function initializeOpenlogin() {
+      setLoading(true)
+      const sdkInstance = new OpenLogin({ 
+        clientId: "YOUR_PROJECT_ID", 
+        network: "testnet"
+      });
+      await sdkInstance.init();
+      if (!sdkInstance.privKey) {
+        history.push('/');
+      }
+
+      await getMaticAccountDetails(sdkInstance.privKey);
+      setSdk(sdkInstance);
+      setLoading(false)
+    }
+    initializeOpenlogin();
+  }, [getMaticAccountDetails, history]);
+
 
   const handleLogout = async () => {
     await sdk.logout();
