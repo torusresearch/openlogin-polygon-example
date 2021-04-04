@@ -9,9 +9,9 @@ import "./style.scss";
 
 function Login() {
   const [loading, setLoading] = useState(false);
-  const [sdk, setSdk] = useState(undefined);
+  const [openlogin, setSdk] = useState(undefined);
   const [walletInfo, setUserAccountInfo] = useState(null);
-  
+
 
   const getMaticClient = useCallback(async(_network, _version) => {
     const network = new Network(_network, _version);
@@ -45,36 +45,42 @@ function Login() {
   },[getMaticClient]);
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true) 
     async function initializeOpenlogin() {
-      const sdkInstance = new OpenLogin({ 
-        clientId: "YOUR_PROJECT_ID", 
+      const sdkInstance = new OpenLogin({
+        clientId: "YOUR_PROJECT_ID",
         network: "testnet"
       });
       await sdkInstance.init();
       if (sdkInstance.privKey) {
         await getMaticAccountDetails(sdkInstance.privKey);
-        setSdk(sdkInstance);
       }
+      setSdk(sdkInstance);
       setLoading(false)
     }
     initializeOpenlogin();
   }, [getMaticAccountDetails]);
 
   async function handleLogin() {
-    const sdkInstance = new OpenLogin({ 
-      clientId: "YOUR_PROJECT_ID", 
-      network: "testnet"
-    });
-    await sdkInstance.login({
-      loginProvider: "google",
-      redirectUrl: `${window.origin}`,
-    });
+    setLoading(true)
+    try {
+      const privKey = await openlogin.login({
+        loginProvider: "google",
+        redirectUrl: `${window.origin}`,
+      });
+      await getMaticAccountDetails(privKey);
+      setLoading(false)
+    } catch (error) {
+      console.log("error", error);
+      setLoading(false)
+
+    }
+  
   }
 
   const handleLogout = async () => {
     setLoading(true)
-    await sdk.logout();
+    await openlogin.logout();
     setLoading(false)
   };
 
@@ -89,11 +95,11 @@ function Login() {
       </div> :
       <div>
         {
-          (sdk && sdk.privKey) ?
-            <AccountInfo 
-              handleLogout={handleLogout} 
-              loading={loading} 
-              privKey={sdk?.privKey}
+          (openlogin && openlogin.privKey) ?
+            <AccountInfo
+              handleLogout={handleLogout}
+              loading={loading}
+              privKey={openlogin?.privKey}
               walletInfo={walletInfo}
             /> :
             <div className="loginContainer">
@@ -103,7 +109,7 @@ function Login() {
                 </div>
             </div>
         }
-      
+
       </div>
     }
     </>
