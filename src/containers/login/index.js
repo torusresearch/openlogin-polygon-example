@@ -61,7 +61,7 @@ function Login() {
          clientId: "BL06YSvMaMDKFD4KY_-UDo5UxlYrdNkOQ2YG08OgmSYE15Xj7RURlD-UtP74RzRsoyUAyDUT1K8FK9USa6Xxsvs",
          network: "testnet",
          originData:{
-           "https://bsc-login.herokuapp.com": "MEUCIQCz8SReiVUpr-l5pYtA3au87q4sLll73R2y6P1-bfsBgwIgRkWLcb7qlyymZ0-H7Nc9AfxnfelzRA0SzqrO3n-CpJ4"
+           "https://polygon-openlogin.herokuapp.com": "MEUCIQCz8SReiVUpr-l5pYtA3au87q4sLll73R2y6P1-bfsBgwIgRkWLcb7qlyymZ0-H7Nc9AfxnfelzRA0SzqrO3n-CpJ4"
          }
       });
       
