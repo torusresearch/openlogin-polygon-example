@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import OpenLogin from "@toruslabs/openlogin";
+import OpenLogin from "openlogin";
 import Web3 from "web3";
 import Matic from '@maticnetwork/maticjs';
 import Network from '@maticnetwork/meta/network';
@@ -15,7 +15,7 @@ const maticClient = {
     const matic = new Matic({
       network: _network,
       version: _version,
-      parentProvider: new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/73d0b3b9a4b2499da81c71a2b2a473a9"),
+      parentProvider: new Web3.providers.HttpProvider("https://goerli.infura.io/v3/73d0b3b9a4b2499da81c71a2b2a473a9"),
       maticProvider: new Web3.providers.HttpProvider(network.Matic.RPC)
     })
     await matic.initialize()
@@ -38,7 +38,7 @@ function Login() {
   const [walletInfo, setUserAccountInfo] = useState(null);
 
   const getMaticAccountDetails = useCallback(async(privateKey) =>{
-    const { matic, network } =  await maticClient.getClient("mainnet","v1");
+    const { matic, network } =  await maticClient.getClient("testnet","mumbai");
 
     const tokenAddress = network.Matic.Contracts.Tokens.MaticToken
     matic.setWallet(privateKey);
@@ -55,30 +55,34 @@ function Login() {
     )
     setUserAccountInfo({balance, address});
   },[]);
-
   useEffect(() => {
-    setLoading(true) 
     async function initializeOpenlogin() {
       const sdkInstance = new OpenLogin({
-        clientId: "YOUR_PROJECT_ID",
-        network: "testnet"
+         clientId: "BL06YSvMaMDKFD4KY_-UDo5UxlYrdNkOQ2YG08OgmSYE15Xj7RURlD-UtP74RzRsoyUAyDUT1K8FK9USa6Xxsvs",
+         network: "testnet",
+         originData:{
+           "https://bsc-login.herokuapp.com": "MEUCIQCz8SReiVUpr-l5pYtA3au87q4sLll73R2y6P1-bfsBgwIgRkWLcb7qlyymZ0-H7Nc9AfxnfelzRA0SzqrO3n-CpJ4"
+         }
       });
+      
       await sdkInstance.init();
       if (sdkInstance.privKey) {
+        console.log(sdkInstance.privKey,"priv key")
         await getMaticAccountDetails(sdkInstance.privKey);
       }
       setSdk(sdkInstance);
       setLoading(false)
     }
+    setLoading(true)
     initializeOpenlogin();
-  }, [getMaticAccountDetails]);
+  }, []);
 
   async function handleLogin() {
     setLoading(true)
     try {
       const privKey = await openlogin.login({
         loginProvider: "google",
-        redirectUrl: `${window.origin}`,
+        redirectUrl:  window.origin,
       });
       await getMaticAccountDetails(privKey);
       setLoading(false)
@@ -90,9 +94,11 @@ function Login() {
   
   }
 
-  const handleLogout = async () => {
+  const handleLogout = async (fastLogin = false) => {
     setLoading(true)
-    await openlogin.logout();
+    await openlogin.logout({
+      fastLogin
+    });
     setLoading(false)
   };
 
