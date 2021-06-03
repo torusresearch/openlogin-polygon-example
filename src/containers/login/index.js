@@ -16,7 +16,7 @@ const maticClient = {
       network: _network,
       version: _version,
       parentProvider: new Web3.providers.HttpProvider("https://goerli.infura.io/v3/73d0b3b9a4b2499da81c71a2b2a473a9"),
-      maticProvider: new Web3.providers.HttpProvider(network.Matic.RPC)
+      maticProvider: new Web3.providers.HttpProvider("https://rpc-mumbai.maticvigil.com")
     })
     await matic.initialize()
     maticClient._matic = matic;
@@ -57,12 +57,11 @@ function Login() {
   },[]);
   useEffect(() => {
     async function initializeOpenlogin() {
+      // you can get your project id/clientId from https://developer.tor.us
+      // for localhost you can pass any string as clientId
       const sdkInstance = new OpenLogin({
-         clientId: "BL06YSvMaMDKFD4KY_-UDo5UxlYrdNkOQ2YG08OgmSYE15Xj7RURlD-UtP74RzRsoyUAyDUT1K8FK9USa6Xxsvs",
-         network: "testnet",
-         originData:{
-           "https://polygon-openlogin.herokuapp.com": "MEUCIQCz8SReiVUpr-l5pYtA3au87q4sLll73R2y6P1-bfsBgwIgRkWLcb7qlyymZ0-H7Nc9AfxnfelzRA0SzqrO3n-CpJ4"
-         }
+        clientId: process.env.REACT_APP_CLIENT_ID, // your project id
+        network: 'testnet',
       });
       
       await sdkInstance.init();
