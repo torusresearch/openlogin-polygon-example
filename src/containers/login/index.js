@@ -11,12 +11,11 @@ const maticClient = {
   _network: null,
   connect: async(_network, _version) => {
     const network = new Network(_network, _version);
-    console.log(network.Main.RPC, network.Matic.RPC)
     const matic = new Matic({
       network: _network,
       version: _version,
       parentProvider: new Web3.providers.HttpProvider("https://goerli.infura.io/v3/73d0b3b9a4b2499da81c71a2b2a473a9"),
-      maticProvider: new Web3.providers.HttpProvider("https://rpc-mumbai.maticvigil.com")
+      maticProvider: new Web3.providers.HttpProvider("https://rpc-mumbai.matic.today")
     })
     await matic.initialize()
     maticClient._matic = matic;
